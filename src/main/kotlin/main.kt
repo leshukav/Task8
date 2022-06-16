@@ -10,7 +10,10 @@ fun main() {
     println(service.chats)
     println(service.getListMessage(4))
  //   println(service.chats.get(listOf(5,1,7)))
-  // println(service.getUnreadChatsCount())
+   println(service.getUnreadChatsCount())
+    service.deteteChat(4)
+    println(service.chats)
+    println(service.getChats(3))
 }
 
 data class Message(
@@ -30,19 +33,19 @@ class ChatService {
     var countMessage: Int = 1
 
 
-    fun createChat(userId: List<Int>, chat: Chat) {
+    fun createChat(userId: List<Int>, chat: Chat): Chat? {
         chat.chatId = countChat
         countChat++
         chat.message = mutableListOf(Message(messageText = "Hi", unRead = false))
-        chats.put(userId, chat)
+        return  chats.put(userId, chat)
 
     }
-    fun addMessage(userIds: List<Int>, message: Message) {
+    fun addMessage(userIds: List<Int>, message: Message): Chat {
         if (chats.containsKey(userIds)) {
-            countMessage = (chats.get(userIds)?.message?.last()?.messageId ?: 1) + 1
+            countMessage = (chats[userIds]?.message?.last()?.messageId ?: 1) + 1
         } else countMessage = 1
         message.messageId = countMessage
-        chats.getOrPut(userIds) {Chat(chatId = countChat++)}.apply { chats.get(userIds)?.message?.add(message) }
+       return chats.getOrPut(userIds) {Chat(chatId = countChat++)}.apply { chats[userIds]?.message?.add(message) }
 
     }
 
@@ -51,19 +54,18 @@ class ChatService {
     }
 
     fun deleteMessage(chatId: Int, messageId: Int) : Boolean {
-        TODO()
+            TODO()   // не знаю пока как сделать.
+
     }
      fun deteteChat(chatId: Int) : Boolean {
-         TODO()
+       return chats.keys.remove(chats.entries.find { it.value.chatId == chatId }?.key)
+
      }
     fun getUnreadChatsCount() : Int {
-  //    var b: Int
-  //    chats.filter  {var b = chats.values.equals(Message().unRead) == false
-   //      b -> b++   }
+        return chats.count { entry -> entry.value.message.any { message -> !message.unRead } }
 
-   ///     return b
-        TODO()
-    }
+        }
+
     fun getListMessage(chatsId: Int): List<Pair<List<Int>, Chat>> {
        return chats.filter { it.value.chatId == chatsId }.toList()
 

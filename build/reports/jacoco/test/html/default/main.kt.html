@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>main.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Chats</a> &gt; <a href="index.source.html" class="el_package">default</a> &gt; <span class="el_source">main.kt</span></div><h1>main.kt</h1><pre class="source lang-java linenums">fun main() {
+<span class="nc" id="L2">  val service= ChatService()</span>
+
+<span class="nc" id="L4">    service.createChat(listOf(4,1,5),Chat())</span>
+<span class="nc" id="L5">    service.createChat(listOf(1),Chat())</span>
+  //  println(service.chats)
+<span class="nc" id="L7">    service.addMessage(listOf(3,1,5), Message(messageText = &quot;Yoops&quot;, unRead = true))</span>
+<span class="nc" id="L8">    service.addMessage(listOf(1,4,5), Message(messageText = &quot;123&quot;, unRead = true))</span>
+<span class="nc" id="L9">    service.addMessage(listOf(1,4,5), Message(messageText = &quot;555&quot;))</span>
+<span class="nc" id="L10">    println(service.chats)</span>
+<span class="nc" id="L11">    println(service.getListMessage(4))</span>
+ //   println(service.chats.get(listOf(5,1,7)))
+<span class="nc" id="L13">   println(service.getUnreadChatsCount())</span>
+<span class="nc" id="L14">    service.deteteChat(4)</span>
+<span class="nc" id="L15">    println(service.chats)</span>
+<span class="nc" id="L16">}</span>
+
+<span class="fc" id="L18">data class Message(</span>
+<span class="pc" id="L19">    var messageId: Int = 1,              // Id СЃРѕРѕР±С‰РµРЅРёСЏ</span>
+<span class="pc" id="L20">    var messageText: String =&quot;&quot;,          // РўРµРєСЃС‚ СЃРѕРѕР±С‰РµРЅРёСЏ</span>
+<span class="pc" id="L21">    var unRead: Boolean = false           // false - РЅРµ РїСЂРѕС‡РёС‚Р°РЅРЅРѕРµ СЃРѕРѕР±С‰РµРЅРёРµ, true - РїСЂРѕС‡РёС‚Р°РЅРЅРѕРµ</span>
+<span class="fc" id="L22">)</span>
+
+<span class="fc" id="L24">data class Chat(</span>
+<span class="pc" id="L25">    var chatId: Int = 0,                                      // Id С‡Р°С‚Р°</span>
+<span class="pc" id="L26">    var message: MutableList&lt;Message&gt; = mutableListOf()      // РЎРѕРѕР±С‰РµРЅРёСЏ С‡Р°С‚Р°</span>
+<span class="fc" id="L27">)</span>
+
+<span class="fc" id="L29">class ChatService {</span>
+<span class="pc" id="L30">    var chats = hashMapOf&lt;List&lt;Int&gt;,Chat&gt;()</span>
+<span class="pc" id="L31">    var countChat: Int = 1</span>
+<span class="pc" id="L32">    var countMessage: Int = 1</span>
+
+
+    fun createChat(userId: List&lt;Int&gt;, chat: Chat): Chat? {
+<span class="fc" id="L36">        chat.chatId = countChat</span>
+<span class="fc" id="L37">        countChat++</span>
+<span class="fc" id="L38">        chat.message = mutableListOf(Message(messageText = &quot;Hi&quot;, unRead = false))</span>
+<span class="fc" id="L39">        return  chats.put(userId, chat)</span>
+
+    }
+    fun addMessage(userIds: List&lt;Int&gt;, message: Message) {
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (chats.containsKey(userIds)) {</span>
+<span class="nc bnc" id="L44" title="All 4 branches missed.">            countMessage = (chats[userIds]?.message?.last()?.messageId ?: 1) + 1</span>
+<span class="nc" id="L45">        } else countMessage = 1</span>
+<span class="nc" id="L46">        message.messageId = countMessage</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        chats.getOrPut(userIds) {Chat(chatId = countChat++)}.apply { chats[userIds]?.message?.add(message) }</span>
+
+<span class="nc" id="L49">    }</span>
+
+    fun getChats(userId: Int) : List&lt;Chat&gt; {
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        return chats.filter { entry -&gt; entry.key.contains(userId) }.values.toList()</span>
+    }
+
+    fun deleteMessage(chatId: Int, messageId: Int) : Boolean {
+<span class="nc" id="L56">            TODO()   // РЅРµ Р·РЅР°СЋ РїРѕРєР° РєР°Рє СЃРґРµР»Р°С‚СЊ.</span>
+
+    }
+     fun deteteChat(chatId: Int) : Boolean {
+<span class="nc bnc" id="L60" title="All 8 branches missed.">       return chats.keys.remove(chats.entries.find { it.value.chatId == chatId }?.key)</span>
+
+     }
+    fun getUnreadChatsCount() : Int {
+<span class="nc bnc" id="L64" title="All 6 branches missed.">        return chats.count { entry -&gt; entry.value.message.any { message -&gt; !message.unRead } }</span>
+
+        }
+
+    fun getListMessage(chatsId: Int): List&lt;Pair&lt;List&lt;Int&gt;, Chat&gt;&gt; {
+<span class="nc bnc" id="L69" title="All 4 branches missed.">       return chats.filter { it.value.chatId == chatsId }.toList()</span>
+
+    }
+
+}
+
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

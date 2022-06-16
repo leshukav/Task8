@@ -1,0 +1,1 @@
+C:\IdeaProjects\Chats\build\classes\kotlin\main\Chat.class;C:\IdeaProjects\Chats\build\classes\kotlin\main\ChatService.class;C:\IdeaProjects\Chats\build\classes\kotlin\main\MainKt.class;C:\IdeaProjects\Chats\build\classes\kotlin\main\Message.class
