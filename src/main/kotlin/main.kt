@@ -1,24 +1,31 @@
-fun main() {
-  val service= ChatService()
+import java.lang.RuntimeException
 
-    service.createChat(listOf(4,1,5),Chat())
-    service.createChat(listOf(1),Chat())
-  //  println(service.chats)
-    service.addMessage(listOf(3,1,5), Message(messageText = "Yoops", unRead = true))
-    service.addMessage(listOf(1,4,5), Message(messageText = "123", unRead = true))
-    service.addMessage(listOf(1,4,5), Message(messageText = "555"))
+fun main() {
+    val service = ChatService()
+
+    service.createChat(listOf(4, 1, 5), Chat())
+    service.createChat(listOf(1), Chat())
+    service.addMessage(listOf(1), Message(messageText = "Hello"))
+    //  println(service.chats)
+    service.addMessage(listOf(3, 1, 5), Message(messageText = "Yoops", unRead = true))
+    service.addMessage(listOf(1, 4, 5), Message(messageText = "123", unRead = true))
+    service.addMessage(listOf(1, 4, 5), Message(messageText = "555"))
     println(service.chats)
-    println(service.getListMessage(4))
- //   println(service.chats.get(listOf(5,1,7)))
-   println(service.getUnreadChatsCount())
-    service.deteteChat(4)
+    //  println(service.getListMessage(4))
+    //   println(service.chats.get(listOf(5,1,7)))
+    //  println(service.getUnreadChatsCount())
+    //   service.deteteChat(4)
+
+    service.addMessage(listOf(3, 1, 5), Message(messageText = "Ky-Ky"))
+    //  println(service.chats)
+    service.deleteMessage(2, 1)
+    service.getListMessage(2)
     println(service.chats)
-    println(service.getChats(3))
 }
 
 data class Message(
     var messageId: Int = 1,              // Id сообщения
-    var messageText: String ="",          // Текст сообщения
+    var messageText: String = "",          // Текст сообщения
     var unRead: Boolean = false           // false - не прочитанное сообщение, true - прочитанное
 )
 
@@ -28,50 +35,65 @@ data class Chat(
 )
 
 class ChatService {
-    var chats = hashMapOf<List<Int>,Chat>()
-    var countChat: Int = 1
+    var chats = hashMapOf<List<Int>, Chat>()
+    var countChat: Int = 0
     var countMessage: Int = 1
 
 
     fun createChat(userId: List<Int>, chat: Chat): Chat? {
-        chat.chatId = countChat
         countChat++
+        chat.chatId = countChat
         chat.message = mutableListOf(Message(messageText = "Hi", unRead = false))
-        return  chats.put(userId, chat)
+        return chats.put(userId, chat)
 
     }
+
     fun addMessage(userIds: List<Int>, message: Message): Chat {
         if (chats.containsKey(userIds)) {
             countMessage = (chats[userIds]?.message?.last()?.messageId ?: 1) + 1
         } else countMessage = 1
         message.messageId = countMessage
-       return chats.getOrPut(userIds) {Chat(chatId = countChat++)}.apply { chats[userIds]?.message?.add(message) }
+        return chats.getOrPut(userIds) { Chat(chatId = countChat++) }.apply { this.message.add(message) }
 
     }
 
-    fun getChats(userId: Int) : List<Chat> {
+    fun getChats(userId: Int): List<Chat> {
         return chats.filter { entry -> entry.key.contains(userId) }.values.toList()
     }
 
-    fun deleteMessage(chatId: Int, messageId: Int) : Boolean {
-            TODO()   // не знаю пока как сделать.
+    fun deleteMessage(chatId: Int, messageId: Int): Boolean {
+        val chat = chats.values.find { it.chatId == chatId } ?: throw ChatNotFoundException("Чата $chatId нет в списке")
+        if (chat.message.any { it.messageId > 1 }) {
+            return chat.message.removeIf { it.messageId == messageId }
+        } else {
+            return deteteChat(chatId)
+        }
+    }
+
+    fun deteteChat(chatId: Int): Boolean {
+        return chats.keys.remove(chats.entries.find { it.value.chatId == chatId }?.key)
 
     }
-     fun deteteChat(chatId: Int) : Boolean {
-       return chats.keys.remove(chats.entries.find { it.value.chatId == chatId }?.key)
 
-     }
-    fun getUnreadChatsCount() : Int {
+    fun getUnreadChatsCount(): Int {
         return chats.count { entry -> entry.value.message.any { message -> !message.unRead } }
 
-        }
-
-    fun getListMessage(chatsId: Int): List<Pair<List<Int>, Chat>> {
-       return chats.filter { it.value.chatId == chatsId }.toList()
-
     }
 
+    fun getListMessage(chatsId: Int): List<Message>? {
+        val chat = chats.values.find { it.chatId == chatsId }
+        chat?.message?.takeLastWhile {
+            it.let {
+                val unRead = it.unRead
+                unRead == true
+                unRead
+            }
+        }
+        return chat?.message?.toList()
+    }
 }
+
+class ChatNotFoundException(err: String) : RuntimeException(err)
 
 
 
