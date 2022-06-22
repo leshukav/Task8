@@ -84,8 +84,8 @@ class ChatService {
         val chat = chats.values.find { it.chatId == chatsId }
         chat?.message?.takeLastWhile {
             it.let {
-                val unRead = it.unRead
-                unRead == true
+                var unRead = it.unRead
+                it.unRead = true
                 unRead
             }
         }
